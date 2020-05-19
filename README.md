@@ -1,17 +1,17 @@
-# Mith-router
+# Mith_router
 
 Routing system to be used with the [Mith framework](https://github.com/JWebCoder/mith)
 
 ## Deno documentation
 
-[doc.deno.land/mith-router](https://doc.deno.land/https/deno.land/x/mith-router/mod.ts)
+[doc.deno.land/mith_router](https://doc.deno.land/https/deno.land/x/mith_router/mod.ts)
 
 ## Usage
 
 **Basic integration with routing**
 ```typescript
 import Mith from 'https://deno.land/x/mith@v0.1.0/mod.ts'
-import Router from 'https://deno.land/x/mith-router@v0.0.1/mod.ts'
+import Router from 'https://deno.land/x/mith_router@v0.0.1/mod.ts'
 const { env } = Deno
 
 const router = new Router()
