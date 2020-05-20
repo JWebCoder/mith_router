@@ -1,4 +1,4 @@
-import { Middleware, Response, NextFunction, Mith } from "https://deno.land/x/mith@v0.1.0/mod.ts";
+import { Middleware, Response, NextFunction, Mith } from "https://deno.land/x/mith/mod.ts";
 import { ServerRequest } from "https://deno.land/std@0.51.0/http/server.ts";
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
@@ -89,11 +89,20 @@ export class Router {
   use(method: methods, path: string, middleware: Middleware | RouterMiddleware | Array<Middleware | RouterMiddleware>) {
     const subApp = new Mith()
     subApp.use(middleware)
-    const isRouter = (middleware as RouterMiddleware).isRouter
+    let isRouter = false
+    if (Array.isArray(middleware)) {
+      isRouter = middleware.filter(
+        (item) => {
+          return (item as RouterMiddleware).isRouter
+        }
+      ).length > 0
+    } else {
+      isRouter = (middleware as RouterMiddleware).isRouter
+    }
     this.paths[method][path] = {
       middleware: subApp,
       isRouter,
-      matcher: match(path, { end: !(middleware as RouterMiddleware).isRouter }),
+      matcher: match(path, { end: !isRouter }),
       route: path,
     }
     this.savedPaths[method] = Object.keys(this.paths[method])
@@ -104,7 +113,6 @@ export class Router {
   */
   getRoutes(): RouterMiddleware {
     const router: RouterMiddleware = async (req: ServerRequest, res: Response, next: NextFunction) => {
-      console.log('middle')
       let matchedRoute = false
       const connectionId = req.conn.rid
       const statePath = getStatePath(req.conn.rid)
@@ -124,9 +132,8 @@ export class Router {
           } else {
             req.requestHandled = true
             deleteStatePath(connectionId)
-            route.middleware.dispatch(req, res, 0, true, next)
           }
-          route.middleware.dispatch(req, res, 0, true, next)
+          return route.middleware.dispatch(req, res, 0, true, next)
         }
       }
       if (!matchedRoute) {

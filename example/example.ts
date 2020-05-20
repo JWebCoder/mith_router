@@ -9,7 +9,7 @@ const app = new Mith()
 app.use(rootRouter.getRoutes())
 app.use(
   (req, res, next) => {
-    console.log(req.requestHandled)
+    console.log('error middleware', req.requestHandled)
     if (res.error) {
       res.status = res.error.status || 500
       res.body = res.error.message

@@ -64,12 +64,6 @@ router.use(
 
 router.use(
   'GET',
-  '/',
-  innerRouter.getRoutes()
-)
-
-router.use(
-  'GET',
   '/multimiddleware',
   [
     (req, res, next) => {
@@ -81,6 +75,12 @@ router.use(
       next()
     }
   ]
+)
+
+router.use(
+  'GET',
+  '/',
+  innerRouter.getRoutes()
 )
 
 export default router
