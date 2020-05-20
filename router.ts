@@ -1,4 +1,4 @@
-import { Middleware, Response, NextFunction } from "https://deno.land/x/mith@v0.1.0/mod.ts";
+import { Middleware, Response, NextFunction, Mith } from "https://deno.land/x/mith@v0.1.0/mod.ts";
 import { ServerRequest } from "https://deno.land/std@0.51.0/http/server.ts";
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
@@ -58,7 +58,7 @@ export class Router {
   private paths: {
     [key in methods]: {
       [key: string]: {
-        middleware: Middleware | RouterMiddleware,
+        middleware: Mith,
         isRouter: boolean,
         matcher: MatchFunction,
         route: string
@@ -86,10 +86,12 @@ export class Router {
    * @param middleware
    * @return void
   */
-  use(method: methods, path: string, middleware: Middleware | RouterMiddleware) {
+  use(method: methods, path: string, middleware: Middleware | RouterMiddleware | Array<Middleware | RouterMiddleware>) {
+    const subApp = new Mith()
+    subApp.use(middleware)
     const isRouter = (middleware as RouterMiddleware).isRouter
     this.paths[method][path] = {
-      middleware,
+      middleware: subApp,
       isRouter,
       matcher: match(path, { end: !(middleware as RouterMiddleware).isRouter }),
       route: path,
@@ -101,10 +103,8 @@ export class Router {
    * @return middleware
   */
   getRoutes(): RouterMiddleware {
-    const router: RouterMiddleware = (req: ServerRequest, res: Response, next: NextFunction) => {
-      if (req.requestHandled) {
-        return next()
-      }
+    const router: RouterMiddleware = async (req: ServerRequest, res: Response, next: NextFunction) => {
+      console.log('middle')
       let matchedRoute = false
       const connectionId = req.conn.rid
       const statePath = getStatePath(req.conn.rid)
@@ -119,14 +119,14 @@ export class Router {
           }
           if (route.isRouter) {
             if (matched.path !== '/') {
-              setStatePath(connectionId, matched.path)
+              setStatePath(connectionId, req.url.replace(statePath, '').replace(matched.path, ''))
             }
           } else {
-            deleteStatePath(connectionId)
             req.requestHandled = true
+            deleteStatePath(connectionId)
+            route.middleware.dispatch(req, res, 0, true, next)
           }
-          route.middleware(req, res, next)
-          return
+          route.middleware.dispatch(req, res, 0, true, next)
         }
       }
       if (!matchedRoute) {
