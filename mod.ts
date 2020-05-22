@@ -15,7 +15,7 @@ interface RouterMiddleware extends Middleware {
   isRouter: boolean
 }
 
-type methods = 'GET' | 'POST' | 'DELETE' | 'PATCH'
+type methods = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'OPTIONS'
 
 const state: {
   [key: number]: string
@@ -69,6 +69,7 @@ export class Router {
     POST: {},
     DELETE: {},
     PATCH: {},
+    OPTIONS: {}
   }
 
   private savedPaths: {
@@ -78,6 +79,7 @@ export class Router {
     POST: [],
     DELETE: [],
     PATCH: [],
+    OPTIONS: []
   }
 
   /** Register middleware to be used with the router.
