@@ -1,4 +1,4 @@
-import { Middleware, Response, NextFunction, Mith } from "https://deno.land/x/mith/mod.ts";
+import { Middleware, Response, NextFunction, Mith } from "https://deno.land/x/mith@v0.1.1/mod.ts";
 import { ServerRequest } from "https://deno.land/std@0.51.0/http/server.ts";
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
@@ -15,7 +15,7 @@ interface RouterMiddleware extends Middleware {
   isRouter: boolean
 }
 
-type methods = 'GET' | 'POST' | 'DELETE' | 'PATCH'
+type methods = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'OPTIONS'
 
 const state: {
   [key: number]: string
@@ -69,6 +69,7 @@ export class Router {
     POST: {},
     DELETE: {},
     PATCH: {},
+    OPTIONS: {}
   }
 
   private savedPaths: {
@@ -78,6 +79,7 @@ export class Router {
     POST: [],
     DELETE: [],
     PATCH: [],
+    OPTIONS: []
   }
 
   /** Register middleware to be used with the router.
@@ -127,7 +129,7 @@ export class Router {
           }
           if (route.isRouter) {
             if (matched.path !== '/') {
-              setStatePath(connectionId, req.url.replace(statePath, '').replace(matched.path, ''))
+              setStatePath(connectionId, (statePath || '') + matched.path)
             }
           } else {
             req.requestHandled = true
