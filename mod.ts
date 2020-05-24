@@ -1,4 +1,4 @@
-import { Middleware, Response, NextFunction, Mith } from "https://deno.land/x/mith@v0.1.1/mod.ts";
+import { Middleware, Response, NextFunction, Mith } from "https://deno.land/x/mith@v0.2.0/mod.ts";
 import { ServerRequest } from "https://deno.land/std@0.51.0/http/server.ts";
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
@@ -89,7 +89,9 @@ export class Router {
    * @return void
   */
   use(method: methods, path: string, middleware: Middleware | RouterMiddleware | Array<Middleware | RouterMiddleware>) {
-    const subApp = new Mith()
+    const subApp = new Mith({
+      isSubApp: true
+    })
     subApp.use(middleware)
     let isRouter = false
     if (Array.isArray(middleware)) {
@@ -135,7 +137,7 @@ export class Router {
             req.requestHandled = true
             deleteStatePath(connectionId)
           }
-          return route.middleware.dispatch(req, res, 0, true, next)
+          return route.middleware.dispatch(req, res, 0, next)
         }
       }
       if (!matchedRoute) {
