@@ -1,7 +1,7 @@
-import { Middleware, Response, Request, NextFunction, Mith } from "https://deno.land/x/mith@v0.4.2/mod.ts";
+import { Middleware, Response, Request, NextFunction, Mith } from "https://deno.land/x/mith@v0.4.3/mod.ts";
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
-declare module "https://deno.land/x/mith@v0.4.2/mod.ts" {
+declare module "https://deno.land/x/mith@v0.4.3/mod.ts" {
   interface Request {
     params: {
       [key: string]: any
