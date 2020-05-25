@@ -1,9 +1,8 @@
-import { Middleware, Response, NextFunction, Mith } from "https://deno.land/x/mith@v0.2.0/mod.ts";
-import { ServerRequest } from "https://deno.land/std@0.51.0/http/server.ts";
+import { Middleware, Response, Request, NextFunction, Mith } from "https://deno.land/x/mith@v0.4.2/mod.ts";
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
-declare module "https://deno.land/std@0.51.0/http/server.ts" {
-  interface ServerRequest {
+declare module "https://deno.land/x/mith@v0.4.2/mod.ts" {
+  interface Request {
     params: {
       [key: string]: any
     }
@@ -89,9 +88,7 @@ export class Router {
    * @return void
   */
   use(method: methods, path: string, middleware: Middleware | RouterMiddleware | Array<Middleware | RouterMiddleware>) {
-    const subApp = new Mith({
-      isSubApp: true
-    })
+    const subApp = new Mith()
     subApp.use(middleware)
     let isRouter = false
     if (Array.isArray(middleware)) {
@@ -110,13 +107,14 @@ export class Router {
       route: path,
     }
     this.savedPaths[method] = Object.keys(this.paths[method])
+    return this
   }
 
   /** Returns a middleware that will trigger the routing system
    * @return middleware
   */
   getRoutes(): RouterMiddleware {
-    const router: RouterMiddleware = async (req: ServerRequest, res: Response, next: NextFunction) => {
+    const router: RouterMiddleware = async (req: Request, res: Response, next: NextFunction) => {
       let matchedRoute = false
       const connectionId = req.conn.rid
       const statePath = getStatePath(req.conn.rid)
