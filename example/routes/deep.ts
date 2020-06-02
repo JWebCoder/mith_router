@@ -1,32 +1,18 @@
 import { Router } from '../deps.ts'
-
+import deeperRouter from './deeper.ts'
 const deepRouter = new Router()
 
 deepRouter.use(
   'GET',
-  '/test/:age',
-  (req, res, next) => {
-    res.body.test = '/test/:name/test/:age'
-    res.body.params = req.params
-    next()
-  }  
-)
-
-deepRouter.use(
-  'GET',
-  '/test',
-  (req, res, next) => {
-    res.body.test = '/test/:name/test'
-    res.body.params = req.params
-    next()
-  }  
+  '/deeper',
+  deeperRouter.getRoutes()
 )
 
 deepRouter.use(
   'GET',
   '/',
   (req, res, next) => {
-    res.body.params = req.params
+    res.body.test = 'deep'
     next()
   }  
 )

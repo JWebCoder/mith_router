@@ -1,20 +1,11 @@
-import { Middleware, Response, Request, NextFunction, Mith } from "https://deno.land/x/mith@v0.4.3/mod.ts";
+import { Middleware, Response, Request, NextFunction, Mith } from 'https://deno.land/x/mith@v0.6.1/mod.ts'
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
-
-declare module "https://deno.land/x/mith@v0.4.3/mod.ts" {
-  interface Request {
-    params: {
-      [key: string]: any
-    }
-    requestHandled: boolean
-  }
-}
 
 interface RouterMiddleware extends Middleware {
   isRouter: boolean
 }
 
-type methods = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'OPTIONS'
+type methods = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS'
 
 const state: {
   [key: number]: string
@@ -66,6 +57,7 @@ export class Router {
   } = {
     GET: {},
     POST: {},
+    PUT: {},
     DELETE: {},
     PATCH: {},
     OPTIONS: {}
@@ -76,6 +68,7 @@ export class Router {
   } = {
     GET: [],
     POST: [],
+    PUT: [],
     DELETE: [],
     PATCH: [],
     OPTIONS: []
@@ -114,13 +107,17 @@ export class Router {
    * @return middleware
   */
   getRoutes(): RouterMiddleware {
-    const router: RouterMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    const router: RouterMiddleware = (req: Request, res: Response, next: NextFunction) => {
       let matchedRoute = false
-      const connectionId = req.conn.rid
-      const statePath = getStatePath(req.conn.rid)
-      for (const savedPath of this.savedPaths[req.method as methods]) {
-        const route = this.paths[req.method as methods][savedPath]
-        const matched = route.matcher(req.url.replace(statePath, '') || '/')
+      const connectionId = req.serverRequest.conn.rid
+      const statePath = getStatePath(connectionId)
+      const {
+        method,
+        url
+      } = req.serverRequest
+      for (const savedPath of this.savedPaths[method as methods]) {
+        const route = this.paths[method as methods][savedPath]
+        const matched = route.matcher(url.replace(statePath, '') || '/')
         if (matched) {
           matchedRoute = true
           req.params = {
@@ -135,7 +132,8 @@ export class Router {
             req.requestHandled = true
             deleteStatePath(connectionId)
           }
-          return route.middleware.dispatch(req, res, 0, next)
+          route.middleware.dispatch(req, res, 'main', 0, next)
+          return
         }
       }
       if (!matchedRoute) {

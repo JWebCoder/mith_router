@@ -1,5 +1,5 @@
-import { Router } from '../deps.ts'
-import innerRouter from './inner.ts'
+import { Router, Request } from '../deps.ts'
+import deepRouter from './deep.ts'
 import app from '../example.ts'
 import userController from '../controllers/users.ts'
 
@@ -9,7 +9,6 @@ router.use(
   'GET',
   '/user/:id',
   (req, res, next) => {
-
     res.body = userController.getUserById(req.params.id)
     next()
   }
@@ -17,31 +16,8 @@ router.use(
 
 router.use(
   'GET',
-  '/users',
-  (req, res, next) => {
-    res.body = userController.getUsers()
-    next()
-  }
-)
-
-router.use(
-  'GET',
-  '/test',
-  (req, res, next) => {
-    res.body.test = '/test'
-    res.body.params = req.params
-    next()
-  }
-)
-
-router.use(
-  'GET',
-  '/tests',
-  (req, res, next) => {
-    res.body.test = '/tests'
-    res.body.params = req.params
-    next()
-  }
+  '/deep',
+  deepRouter.getRoutes()
 )
 
 router.use(
@@ -80,7 +56,26 @@ router.use(
 router.use(
   'GET',
   '/',
-  innerRouter.getRoutes()
+  (req, res, next) => {
+    res.body = { test: 'get' }
+    next()
+  }
+)
+.use(
+  'POST',
+  '/',
+  async (req: Request, res, next) => {
+    res.body = { test: 'post' }
+    next()
+  }
+)
+.use(
+  'PUT',
+  '/',
+  async (req: Request, res, next) => {
+    res.body = { test: 'put' }
+    next()
+  }
 )
 
 export default router
