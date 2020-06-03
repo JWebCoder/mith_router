@@ -106,7 +106,7 @@ export class Router {
   /** Returns a middleware that will trigger the routing system
    * @return middleware
   */
-  getRoutes(): RouterMiddleware {
+  getRoutes(): Middleware {
     const router: RouterMiddleware = (req: Request, res: Response, next: NextFunction) => {
       let matchedRoute = false
       const connectionId = req.serverRequest.conn.rid
