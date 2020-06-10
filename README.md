@@ -10,8 +10,8 @@ Routing system to be used with the [Mith framework](https://github.com/JWebCoder
 
 **Basic integration with routing**
 ```typescript
-import Mith from 'https://deno.land/x/mith@v0.1.0/mod.ts'
-import Router from 'https://deno.land/x/mith_router@v0.0.1/mod.ts'
+import { Mith } from 'https://deno.land/x/mith@v0.7.0/mod.ts'
+import { Router } from 'https://deno.land/x/mith_router@v0.2.0/mod.ts'
 const { env } = Deno
 
 const router = new Router()
