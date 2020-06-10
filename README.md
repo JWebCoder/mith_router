@@ -1,10 +1,9 @@
 # Mith_router
 
+![mith ci](https://github.com/JWebCoder/mith_router/workflows/mith%20router%20ci/badge.svg)
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/mith_router/mod.ts)
+
 Routing system to be used with the [Mith framework](https://github.com/JWebCoder/mith)
-
-## Deno documentation
-
-[doc.deno.land/mith_router](https://doc.deno.land/https/deno.land/x/mith_router/mod.ts)
 
 ## Usage
 
