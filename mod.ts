@@ -9,12 +9,6 @@ interface RouterMiddleware<
   isRouter: boolean
 }
 
-interface Req extends IRequest {
-  params: any
-  requestHandled: boolean
-}
-
-
 type methods = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS'
 
 const state: {
@@ -116,7 +110,7 @@ export class Router {
   /** Returns a middleware that will trigger the routing system
    * @return middleware
   */
-  getRoutes() {
+  getRoutes(): Middleware {
     const router = (req: IRequest, res: IResponse, next: NextFunction) => {
       const connectionId = req.serverRequest.conn.rid
       const statePath = getStatePath(connectionId)
