@@ -1,4 +1,4 @@
-import { Router, Request } from '../deps.ts'
+import { Router } from '../deps.ts'
 import deepRouter from './deep.ts'
 import app from '../example.ts'
 import userController from '../controllers/users.ts'
@@ -64,7 +64,7 @@ router.use(
 .use(
   'POST',
   '/',
-  async (req: Request, res, next) => {
+  async (req, res, next) => {
     res.body = { test: 'post' }
     next()
   }
@@ -72,7 +72,7 @@ router.use(
 .use(
   'PUT',
   '/',
-  async (req: Request, res, next) => {
+  async (req, res, next) => {
     res.body = { test: 'put' }
     next()
   }
