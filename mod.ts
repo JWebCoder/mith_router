@@ -1,4 +1,4 @@
-import { Middleware, Response, Request, NextFunction, Mith } from 'https://deno.land/x/mith@v0.7.0/mod.ts'
+import { Middleware, Response, Request, NextFunction, Mith } from 'https://deno.land/x/mith@v0.8.1/mod.ts'
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
 interface RouterMiddleware<
@@ -112,7 +112,6 @@ export class Router {
   */
   getRoutes<Req extends Request, Res extends Response, Next extends NextFunction>(): Middleware {
     const router: RouterMiddleware<Req, Res, Next> = (req: Request, res: Response, next: NextFunction) => {
-      let matchedRoute = false
       const connectionId = req.serverRequest.conn.rid
       const statePath = getStatePath(connectionId)
       const {
@@ -123,7 +122,6 @@ export class Router {
         const route = this.paths[method as methods][savedPath]
         const matched = route.matcher(url.replace(statePath, '') || '/')
         if (matched) {
-          matchedRoute = true
           req.params = {
             ...req.params,
             ...matched.params
@@ -140,10 +138,8 @@ export class Router {
           return
         }
       }
-      if (!matchedRoute) {
-        deleteStatePath(connectionId)
-        next()
-      }
+      deleteStatePath(connectionId)
+      next()
     }
 
     router.isRouter = true
