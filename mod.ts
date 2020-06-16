@@ -1,9 +1,9 @@
-import { Middleware, Response, Request, NextFunction, Mith } from 'https://deno.land/x/mith@v0.8.1/mod.ts'
+import { Middleware, IResponse, IRequest, NextFunction, Mith } from 'https://deno.land/x/mith@v0.8.3/mod.ts'
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
 interface RouterMiddleware<
-  Req extends Request = any,
-  Res extends Response = any,
+  Req extends IRequest = any,
+  Res extends IResponse = any,
   Next extends NextFunction = any
 > extends Middleware {
   isRouter: boolean
@@ -110,8 +110,8 @@ export class Router {
   /** Returns a middleware that will trigger the routing system
    * @return middleware
   */
-  getRoutes<Req extends Request, Res extends Response, Next extends NextFunction>(): Middleware {
-    const router: RouterMiddleware<Req, Res, Next> = (req: Request, res: Response, next: NextFunction) => {
+  getRoutes(): Middleware {
+    const router = (req: IRequest, res: IResponse, next: NextFunction) => {
       const connectionId = req.serverRequest.conn.rid
       const statePath = getStatePath(connectionId)
       const {
