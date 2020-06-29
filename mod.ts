@@ -120,7 +120,7 @@ export class Router {
       } = req.serverRequest
       for (const savedPath of this.savedPaths[method as methods]) {
         const route = this.paths[method as methods][savedPath]
-        const matched = route.matcher(url.replace(statePath, '') || '/')
+        const matched = route.matcher(url.split('?')[0].replace(statePath, '') || '/')
         if (matched) {
           req.params = {
             ...req.params,
