@@ -1,4 +1,4 @@
-import { Middleware, IResponse, IRequest, NextFunction, Mith } from 'https://deno.land/x/mith@v0.8.4/mod.ts'
+import { Middleware, IResponse, IRequest, NextFunction, Mith } from 'https://deno.land/x/mith@v0.9.3/mod.ts'
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
 interface RouterMiddleware<
