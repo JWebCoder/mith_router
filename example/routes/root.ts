@@ -14,8 +14,7 @@ router.use(
   }
 )
 
-router.use(
-  'GET',
+router.useRouter(
   '/deep',
   deepRouter.getRoutes()
 )

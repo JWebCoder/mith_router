@@ -1,4 +1,4 @@
-import { Middleware, IResponse, IRequest, NextFunction, Mith } from 'https://deno.land/x/mith@v0.9.3/mod.ts'
+import { Middleware, IResponse, IRequest, NextFunction, Mith } from 'https://deno.land/x/mith@v0.9.4/mod.ts'
 import { match, MatchFunction } from 'https://raw.githubusercontent.com/pillarjs/path-to-regexp/master/src/index.ts'
 
 interface RouterMiddleware<
@@ -9,8 +9,15 @@ interface RouterMiddleware<
   isRouter: boolean
 }
 
-type methods = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS'
-
+type methodTypes = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS'
+const allMethods: Array<methodTypes> = [
+  'GET',
+  'POST',
+  'PUT',
+  'DELETE',
+  'PATCH',
+  'OPTIONS'
+]
 const state: {
   [key: number]: string
 } = {}
@@ -50,7 +57,7 @@ const deleteStatePath = (id: number) => {
  */
 export class Router {
   private paths: {
-    [key in methods]: {
+    [key in methodTypes]: {
       [key: string]: {
         middleware: Mith,
         isRouter: boolean,
@@ -68,7 +75,7 @@ export class Router {
   }
 
   private savedPaths: {
-    [key in methods]: string[]
+    [key in methodTypes]: string[]
   } = {
     GET: [],
     POST: [],
@@ -84,7 +91,7 @@ export class Router {
    * @param middleware
    * @return void
   */
-  use(method: methods, path: string, middleware: Middleware | RouterMiddleware | Array<Middleware | RouterMiddleware>) {
+  use(method: methodTypes, path: string, middleware: Middleware | RouterMiddleware | Array<Middleware | RouterMiddleware>) {
     const subApp = new Mith()
     subApp.use(middleware)
     let isRouter = false
@@ -107,6 +114,28 @@ export class Router {
     return this
   }
 
+  /** Register router middleware to be used with the router.
+   * @param path path that will be matched with the requested url
+   * @param middleware
+   * @return void
+  */
+ useRouter(path: string, middleware: RouterMiddleware | Array<RouterMiddleware>) {
+  const subApp = new Mith()
+  subApp.use(middleware)
+  allMethods.forEach(
+    (method) => {
+      this.paths[method][path] = {
+        middleware: subApp,
+        isRouter: true,
+        matcher: match(path, { end: false }),
+        route: path,
+      }
+      this.savedPaths[method] = Object.keys(this.paths[method])
+    }
+  )
+  return this
+}
+
   /** Returns a middleware that will trigger the routing system
    * @return middleware
   */
@@ -118,8 +147,8 @@ export class Router {
         method,
         url
       } = req.serverRequest
-      for (const savedPath of this.savedPaths[method as methods]) {
-        const route = this.paths[method as methods][savedPath]
+      for (const savedPath of this.savedPaths[method as methodTypes]) {
+        const route = this.paths[method as methodTypes][savedPath]
         const matched = route.matcher(url.split('?')[0].replace(statePath, '') || '/')
         if (matched) {
           req.params = {
